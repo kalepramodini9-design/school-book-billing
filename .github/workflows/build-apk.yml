@@ -11,22 +11,36 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Set up Flutter
+      - name: Setup Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+
+      - name: Setup Flutter
         uses: subosito/flutter-action@v2
         with:
           flutter-version: '3.35.2'
           channel: stable
+          cache: true
 
-      - name: Create Android project
-        run: flutter create .
+      - name: Create Android platform
+        run: flutter create --platforms=android .
 
-      - name: Get dependencies
+      - name: Flutter version
+        run: flutter --version
+
+      - name: Get packages
         run: flutter pub get
 
+      - name: Analyze project
+        run: flutter analyze
+
       - name: Build APK
-        run: flutter build apk --release
+        run: flutter build apk --release --verbose
 
       - name: Upload APK
+        if: success()
         uses: actions/upload-artifact@v4
         with:
           name: school-book-billing-apk
